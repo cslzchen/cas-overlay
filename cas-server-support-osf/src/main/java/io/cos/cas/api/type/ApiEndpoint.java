@@ -17,41 +17,63 @@
  * under the License.
  */
 
-package io.cos.cas.types;
+package io.cos.cas.api.type;
 
 /**
- * Open Science Framework API Endpoint Types.
+ * Open Science Framework API Endpoint Type.
  *
  * @author Longze
  * @since 4.1.5
  */
 public enum ApiEndpoint {
 
-    /** User Login. */
-    AUTH_LOGIN("auth/login"),
+    /** OSF Default Login. */
+    AUTH_LOGIN(ApiEndpoint.AUTH + "/login"),
 
-    /** User Register. */
-    AUTH_REGISTER("auth/register"),
+    /** OSF Account Creation. */
+    AUTH_REGISTER(ApiEndpoint.AUTH + "/register"),
 
-    /** Login through Institutions. */
-    AUTH_INSTITUTION("auth/institution"),
+    /** OSF Institution Login. */
+    AUTH_INSTITUTION(ApiEndpoint.AUTH + "/institution"),
+
+    /** OSF Non-institution External Login. */
+    AUTH_EXTERNAL(ApiEndpoint.AUTH + "/external"),
+
+    /** OSF Non-institution External Login: Create Or Link OSF Account. */
+    AUTH_EXTERNAL_CREATE_OR_LINK(ApiEndpoint.AUTH_EXTERNAL.getId() + "/createOrLink"),
+
+    /** Verify Email. */
+    AUTH_VERIFY_EMAIL(ApiEndpoint.AUTH + "/verifyEmail"),
+
+    /** Reset Password. */
+    AUTH_RESET_PASSWORD(ApiEndpoint.AUTH + "/resetPassword"),
 
     /** Load Developer Applications as Registered Services. */
-    SERVICE_DEVELOPER_APPS("service/developerApps"),
+    SERVICE_LOAD_DEVELOPER_APPS(ApiEndpoint.SERVICE + "/loadDeveloperApps"),
 
-    /** Load Institutions as Registered Services. */
-    SERVICE_INSTITUTIONS("service/institutions"),
+    /** Load OSF Institutions as Registered Services. */
+    SERVICE_LOAD_INSTITUTIONS(ApiEndpoint.SERVICE + "/loadInstitutions"),
+
+    /** Find OSF Account by Email. */
+    SERVICE_FIND_ACCOUNT(ApiEndpoint.SERVICE + "/findAccount"),
 
     /** Personal Access Token. */
-    SERVICE_PERSONAL_ACCESS_TOKEN("service/personalAccessToken"),
+    SERVICE_CHECK_PERSONAL_ACCESS_TOKEN(ApiEndpoint.SERVICE + "/checkPAT"),
 
     /** OAuth Scopes. */
-    SERVICE_OAUTH_SCOPES("service/oauthScopes");
+    SERVICE_CHECK_OAUTH_SCOPE(ApiEndpoint.SERVICE + "/checkOauthScope");
 
+    /** Prefix for Authentication Endpoints. */
+    private static final String AUTH = "auth";
+
+    /** Prefix for Service (Non-authentication) Endpoints. */
+    private static final String SERVICE = "service";
+
+    /** The id of the API Endpoint as a String. */
     private final String id;
 
     /**
-     * API Endpoints Constructor.
+     * API Endpoint Type Constructor.
      *
      * @param id the id of the API Endpoint
      */

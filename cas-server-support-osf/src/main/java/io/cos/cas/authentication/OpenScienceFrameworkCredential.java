@@ -53,219 +53,83 @@ public class OpenScienceFrameworkCredential extends RememberMeUsernamePasswordCr
     /** Time-based One Time Password suffix appended to username in string representation. */
     private static final String ONE_TIME_PASSWORD_SUFFIX = "+otp";
 
-    /** The Verification Key. */
     private String verificationKey;
 
-    /** The One Time Password. */
     private String oneTimePassword;
 
-    /** Indicates a Remote Principal. */
     private Boolean remotePrincipal = Boolean.FALSE;
 
-    /** The Institution Id. */
     private String institutionId;
 
-    private String fullname;
-    private String usernameConfirm;
-    private String passwordConfirm;
-    private String campaign;
-    private Boolean createAccount = Boolean.FALSE;
+    private String nonInstitutionExternalIdProvider;
 
-    /** The Authentication Delegation Protocol. */
+    private String nonInstitutionExternalId;
+
     private DelegationProtocol delegationProtocol;
 
-    /** The Attributes Released from Authentication Delegation. */
     private Map<String, String> delegationAttributes = new HashMap<>();
 
-    /** Default constructor. */
+    /** Default Constructor. */
     public OpenScienceFrameworkCredential() {}
 
-    /**
-     * Creates a new instance with the given username and password.
-     *
-     * @param username Non-null user name.
-     * @param password Non-null password.
-     * @param rememberMe remember me.
-     * @param verificationKey verification key.
-     */
-    public OpenScienceFrameworkCredential(
-            final String username,
-            final String password,
-            final Boolean rememberMe,
-            final String verificationKey
-    ) {
-        this(username, password, rememberMe, verificationKey, null);
-    }
-
-    /**
-     * Creates a new instance with the given username and password.
-     *
-     * @param username Non-null user name.
-     * @param password Non-null password.
-     * @param rememberMe remember me.
-     * @param verificationKey verification key.
-     * @param oneTimePassword one time password.
-     */
-    public OpenScienceFrameworkCredential(
-            final String username,
-            final String password,
-            final Boolean rememberMe,
-            final String verificationKey,
-            final String oneTimePassword
-    ) {
-        this.setUsername(username);
-        this.setPassword(password);
-        this.setRememberMe(rememberMe);
-        this.setVerificationKey(verificationKey);
-        this.setOneTimePassword(oneTimePassword);
-    }
-
-    /**
-     * Create a ne instance with given parameters during account creation.
-     *
-     * @param fullname user's full name
-     * @param username user's email
-     * @param usernameConfirm confirm email
-     * @param password user's password
-     * @param passwordConfirm confirm password
-     * @param campaign campaign information
-     * @param createAccount register flag, must be 'true'
-     */
-    public OpenScienceFrameworkCredential(
-            final String fullname,
-            final String username,
-            final String usernameConfirm,
-            final String password,
-            final String passwordConfirm,
-            final String campaign,
-            final String createAccount
-    ) {
-        if (username.equals(usernameConfirm) && password.equals(passwordConfirm) && "true".equals(createAccount)) {
-            this.fullname = fullname;
-            this.usernameConfirm = usernameConfirm;
-            this.passwordConfirm = passwordConfirm;
-            this.setUsername(username);
-            this.setPassword(password);
-            this.setCampaign(campaign);
-            this.createAccount = Boolean.TRUE;
-        }
-    }
-
-    /**
-     * @return Returns the Verification Key.
-     */
     public String getVerificationKey() {
         return this.verificationKey;
     }
 
-    /**
-     * @param verificationKey The Verification Key to set.
-     */
     public void setVerificationKey(final String verificationKey) {
         this.verificationKey = verificationKey;
     }
 
-    /**
-     * @return Returns the One Time Password.
-     */
     public String getOneTimePassword() {
         return this.oneTimePassword;
     }
 
-    /**
-     * @param oneTimePassword the One Time Password to set.
-     */
     public void setOneTimePassword(final String oneTimePassword) {
         this.oneTimePassword = oneTimePassword;
     }
 
-    /**
-     * @return Returns the Remote Principal.
-     */
     public final Boolean isRemotePrincipal() {
         return this.remotePrincipal;
     }
 
-    /**
-     * @param remotePrincipal the Remote Principal.
-     */
     public final void setRemotePrincipal(final Boolean remotePrincipal) {
         this.remotePrincipal = remotePrincipal;
     }
 
-    /**
-     * @return Returns the Institution Id.
-     */
     public final String getInstitutionId() {
         return this.institutionId;
     }
 
-    /**
-     * @param institutionId the Institution Id.
-     */
     public final void setInstitutionId(final String institutionId) {
         this.institutionId = institutionId;
     }
 
-    /**
-     * @return Returns the Delegation Protocol.
-     */
+    public String getNonInstitutionExternalIdProvider() {
+        return nonInstitutionExternalIdProvider;
+    }
+
+    public void setNonInstitutionExternalIdProvider(final String nonInstitutionIdExternalProvider) {
+        this.nonInstitutionExternalIdProvider = nonInstitutionIdExternalProvider;
+    }
+
+    public String getNonInstitutionExternalId() {
+        return nonInstitutionExternalId;
+    }
+
+    public void setNonInstitutionExternalId(final String nonInstitutionExternalId) {
+        this.nonInstitutionExternalId = nonInstitutionExternalId;
+    }
+
     public final DelegationProtocol getDelegationProtocol() {
         return delegationProtocol;
     }
 
-    /**
-     * @param delegationProtocol the Delegation Protocol.
-     */
     public void setDelegationProtocol(final DelegationProtocol delegationProtocol) {
         this.delegationProtocol = delegationProtocol;
     }
 
-    /**
-     * @return Returns the Released Attributes from Authentication Delegation.
-     */
     public final Map<String, String> getDelegationAttributes() {
         return delegationAttributes;
-    }
-
-    public void setFullname(final String fullname) {
-        this.fullname =fullname;
-    }
-
-    public void setUsernameConfirm(final String usernameConfirm) {
-        this.usernameConfirm = usernameConfirm;
-    }
-
-    public void setPasswordConfirm(final String passwordConfirm) {
-        this.passwordConfirm = passwordConfirm;
-    }
-
-    public void setCampaign(final String campaign) {
-        this.campaign = campaign;
-    }
-
-    public void setCreateAccount(final Boolean createAccount) {
-        this.createAccount = createAccount;
-    }
-
-    public Boolean getCreateAccount() {
-        return createAccount;
-    }
-
-    public String getCampaign() {
-        return campaign;
-    }
-
-    public String getFullname() {
-        return fullname;
-    }
-
-    public String getUsernameConfirm() {
-        return usernameConfirm;
-    }
-
-    public String getPasswordConfirm() {
-        return passwordConfirm;
     }
 
     /**

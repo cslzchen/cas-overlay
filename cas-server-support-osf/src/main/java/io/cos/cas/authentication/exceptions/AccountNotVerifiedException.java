@@ -22,20 +22,20 @@ package io.cos.cas.authentication.exceptions;
 import javax.security.auth.login.AccountException;
 
 /**
- * Describes an error condition where authentication occurs from a registered but not confirmed account.
+ * Describes an error condition where authentication occurs from a registered account pending verification.
  *
  * @author Michael Haselton
  * @author Longze Chen
  * @since 4.1.5
  */
-public class UserNotConfirmedException extends AccountException {
+public class AccountNotVerifiedException extends AccountException {
 
     private static final long serialVersionUID = -6941281359700123973L;
 
     /**
      * Instantiates a new invalid login location exception.
      */
-    public UserNotConfirmedException() {
+    public AccountNotVerifiedException() {
         super();
     }
 
@@ -44,7 +44,7 @@ public class UserNotConfirmedException extends AccountException {
      *
      * @param message the message
      */
-    public UserNotConfirmedException(final String message) {
+    public AccountNotVerifiedException(final String message) {
         super(message);
     }
 }

@@ -18,14 +18,13 @@
     under the License.
 
 --%>
-<jsp:directive.include file="includes/top.jsp" />
+<jsp:directive.include file="./includes/top.jsp" />
 
 <div id="msg" class="errors">
-    <spring:eval var="osfResendConfirmationUrl" expression="@casProperties.getProperty('osf.resendConfirmation.url')" />
-    <h2><spring:message code="screen.usernotconfirmed.heading" /></h2>
-    <p><spring:message code="screen.usernotconfirmed.message" arguments="${osfResendConfirmationUrl}" /></p>
+    <h2><spring:message code="screen.exception.invalidRequest.heading" /></h2>
+    <p><spring:message code="screen.exception.invalidRequest.message" /></p>
 </div>
 
 <c:set var="alternativeBottomLogin" value="true"/>
 
-<jsp:directive.include file="includes/bottom.jsp" />
+<jsp:directive.include file="./includes/bottom.jsp" />

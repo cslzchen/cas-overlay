@@ -19,8 +19,9 @@
 
 package io.cos.cas.authentication.handler;
 
-import io.cos.cas.api.OpenScienceFrameworkApiCasEndpoint;
-import io.cos.cas.types.ApiEndpoint;
+import io.cos.cas.api.handler.ApiEndpointHandler;
+import io.cos.cas.api.type.ApiEndpoint;
+import org.apache.http.HttpStatus;
 import org.jasig.cas.support.oauth.scope.Scope;
 import org.jasig.cas.support.oauth.scope.handler.support.AbstractScopeHandler;
 import org.json.JSONObject;
@@ -41,9 +42,8 @@ public class OpenScienceFrameworkScopeHandler extends AbstractScopeHandler imple
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OpenScienceFrameworkScopeHandler.class);
 
-    /** The Open Science Framework API CAS Endpoint instance. */
     @NotNull
-    private OpenScienceFrameworkApiCasEndpoint osfApiCasEndpoint;
+    private ApiEndpointHandler apiEndpointHandler;
 
     /** Default Constructor. */
     public OpenScienceFrameworkScopeHandler() {}
@@ -54,24 +54,27 @@ public class OpenScienceFrameworkScopeHandler extends AbstractScopeHandler imple
     @Override
     public Scope getScope(final String scopeName) {
 
-        final JSONObject data = new JSONObject();
-        data.put("scopeName", scopeName);
+        final JSONObject data = new JSONObject().put("scopeName", scopeName);
+        final JSONObject response = apiEndpointHandler.handle(
+                ApiEndpoint.SERVICE_CHECK_OAUTH_SCOPE,
+                apiEndpointHandler.encryptPayload("data", data.toString())
+        );
 
-        // encrypt the payload using JWE/JWT
-        final String encryptedPayload = osfApiCasEndpoint.encryptPayload("data", data.toString());
+        if (response != null && response.getInt("status") == HttpStatus.SC_OK) {
+            final JSONObject responseBody = response.getJSONObject("body");
+            if (responseBody == null || !responseBody.has("scopeDescription")) {
+                LOGGER.debug("Invalid Response");
+                return null;
+            }
 
-        // talk to API `/cas/service/oauthScopes/` endpoint
-        final JSONObject response = osfApiCasEndpoint.apiCasService(ApiEndpoint.SERVICE_OAUTH_SCOPES, encryptedPayload);
-        if (response == null || !response.has("scopeDescription")) {
-            LOGGER.debug("Invalid Response");
-            return null;
+            final String scopeDescription = (String) responseBody.get("scopeDescription");
+            return new Scope(scopeName, scopeDescription, Boolean.FALSE);
         }
 
-        final String scopeDescription = (String) response.get("scopeDescription");
-        return new Scope(scopeName, scopeDescription, Boolean.FALSE);
+        return null;
     }
 
-    public void setOsfApiCasEndpoint(final OpenScienceFrameworkApiCasEndpoint osfApiCasEndpoint) {
-        this.osfApiCasEndpoint = osfApiCasEndpoint;
+    public void setApiEndpointHandler(final ApiEndpointHandler apiEndpointHandler) {
+        this.apiEndpointHandler = apiEndpointHandler;
     }
 }

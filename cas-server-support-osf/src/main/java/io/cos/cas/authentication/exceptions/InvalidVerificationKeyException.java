@@ -22,27 +22,29 @@ package io.cos.cas.authentication.exceptions;
 import javax.security.auth.login.AccountException;
 
 /**
- * Describes an error condition where registration failed due to user already registered.
+ * Describes an error condition where authentication occurs when using an invalid verification key.
  *
+ * @author Michael Haselton
  * @author Longze Chen
  * @since 4.1.5
  */
-public class RegistrationFailureUserAlreadyExistsException extends AccountException {
+public class InvalidVerificationKeyException extends AccountException {
 
-    private static final long serialVersionUID = 1200784660656118770L;
+    private static final long serialVersionUID = 1271266461167445623L;
 
     /**
-     * Default Constructor.
+     * Instantiates a new invalid login location exception.
      */
-    public RegistrationFailureUserAlreadyExistsException() {
+    public InvalidVerificationKeyException() {
         super();
     }
 
     /**
-     * Create a instance of RegistrationFailureUserAlreadyExistsException with a given message.
+     * Instantiates a new invalid login location exception.
+     *
      * @param message the message
      */
-    public RegistrationFailureUserAlreadyExistsException(final String message) {
+    public InvalidVerificationKeyException(final String message) {
         super(message);
     }
 }

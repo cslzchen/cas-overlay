@@ -25,6 +25,7 @@
                           http://www.springframework.org/schema/webflow/spring-webflow.xsd">
 
     <var name="credential" class="io.cos.cas.authentication.OpenScienceFrameworkCredential"/>
+
     <on-start>
         <evaluate expression="initialFlowSetupAction"/>
     </on-start>
@@ -97,12 +98,14 @@
         <transition on="success" to="sendTicketGrantingTicket" />
         <transition on="authenticationFailure" to="handleAuthenticationFailure" />
         <transition on="error" to="beforeLogin" />
+        <transition on="createOrLink" to="viewCreateOrLinkOsfAccountRedirect" />
     </action-state>
+
+    <end-state id="viewCreateOrLinkOsfAccountRedirect" view="externalRedirect:#{flowScope.createOrLinkOsfAccountUrl}" />
 
     <action-state id="beforeLogin">
         <evaluate expression="loginHandler.beforeLogin(flowRequestContext)" />
         <transition on="osfDefaultLogin" to="viewLoginForm" />
-        <transition on="osfDefaultRegister" to="viewRegisterForm" />
         <transition on="institutionLogin" to="osfInstitutionLogin" />
     </action-state>
 
@@ -114,29 +117,11 @@
     <view-state id="viewInstitutionLoginForm" view="casInstitutionLoginView">
     </view-state>
 
-    <view-state id="viewRegisterForm" view="casRegisterView" model="credential">
-        <binder>
-            <binding property="fullname" required="true" />
-            <binding property="username" required="true" />
-            <binding property="usernameConfirm" required="true" />
-            <binding property="password" required="true" />
-            <binding property="passwordConfirm" required="true" />
-            <binding property="campaign" required="false" />
-            <binding property="createAccount" required="true" />
-        </binder>
-        <on-entry>
-            <set name="viewScope.commandName" value="'credential'"/>
-        </on-entry>
-        <transition on="submit" bind="true" validate="true" to="realSubmit"/>
-    </view-state>
-
     <view-state id="viewLoginForm" view="casLoginView" model="credential">
         <binder>
             <binding property="username" required="true"/>
             <binding property="password" required="true"/>
             <binding property="rememberMe" />
-            <binding property="verificationKey" />
-            <binding property="oneTimePassword" />
         </binder>
         <on-entry>
             <set name="viewScope.commandName" value="'credential'"/>
@@ -213,10 +198,10 @@
 
         <!-- Open Science Framework Login -->
         <transition on="AccountNotFoundException" to="generateLoginTicket"/>
-        <transition on="FailedLoginException" to="generateLoginTicket"/>
-        <transition on="UserNotConfirmedException" to="casUserNotConfirmedView" />
-        <transition on="UserNotClaimedException" to="casUserNotClaimedView" />
+        <transition on="AccountNotVerifiedException" to="casAccountNotVerifiedView" />
         <transition on="AccountDisabledException" to="casAccountDisabledView"/>
+        <transition on="FailedLoginException" to="generateLoginTicket"/>
+        <transition on="InvalidVerificationKeyException" to="generateLoginTicket"/>
         <transition on="ShouldNotHappenException" to="casShouldNotHappenView" />
 
         <!-- Open Science Framework Remote Login -->
@@ -226,9 +211,6 @@
         <transition on="OneTimePasswordRequiredException" to="casOtpLoginView"/>
         <transition on="OneTimePasswordFailedLoginException" to="casOtpLoginView"/>
 
-        <!-- Open Science Framework Registration-->
-        <transition on="RegistrationFailureUserAlreadyExistsException" to="viewRegisterForm"/>
-        <transition on="RegistrationSuccessConfirmationRequiredException" to="viewRegisterForm"/>
     </action-state>
 
     <action-state id="sendTicketGrantingTicket">
@@ -276,7 +258,6 @@
         </on-entry>
     </end-state>
 
-
     <!--
     The "showWarningView" end state is the end state for when the user has requested privacy settings (to be "warned") to be turned on.  It delegates to a
     view defines in default_views.properties that display the "Please click here to go to the service." message.
@@ -298,8 +279,8 @@
 
     <!-- Open Science Framework Login Exceptions View -->
     <end-state id="casAccountDisabledView" view="casAccountDisabledView" />
-    <end-state id="casUserNotConfirmedView" view="casUserNotConfirmedView" />
-    <end-state id="casUserNotClaimedView" view="casUserNotClaimedView" />
+    <end-state id="casAccountNotVerifiedView" view="casAccountNotVerifiedView" />
+    <end-state id="casInvalidVerificationKeyView" view="casInvalidVerificationKeyView" />
     <end-state id="casShouldNotHappenView" view="casShouldNotHappenView" />
     <end-state id="casRemoteUserFailedLoginView" view="casRemoteUserFailedLoginView" />
 

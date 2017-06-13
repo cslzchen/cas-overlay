@@ -24,15 +24,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import io.cos.cas.authentication.OpenScienceFrameworkCredential;
+import io.cos.cas.authentication.exceptions.InvalidVerificationKeyException;
 import io.cos.cas.authentication.exceptions.OneTimePasswordFailedLoginException;
 import io.cos.cas.authentication.exceptions.OneTimePasswordRequiredException;
 import io.cos.cas.authentication.exceptions.RemoteUserFailedLoginException;
-import io.cos.cas.authentication.exceptions.RegistrationFailureUserAlreadyExistsException;
-import io.cos.cas.authentication.exceptions.RegistrationSuccessConfirmationRequiredException;
 import io.cos.cas.authentication.exceptions.ShouldNotHappenException;
-import io.cos.cas.authentication.exceptions.UserNotClaimedException;
-import io.cos.cas.authentication.exceptions.UserNotConfirmedException;
+import io.cos.cas.authentication.exceptions.AccountNotVerifiedException;
 
+import io.cos.cas.web.util.AbstractFlowUtils;
 import org.jasig.cas.authentication.AccountDisabledException;
 import org.jasig.cas.authentication.AccountPasswordMustChangeException;
 import org.jasig.cas.authentication.AuthenticationException;
@@ -40,6 +40,7 @@ import org.jasig.cas.authentication.InvalidLoginLocationException;
 import org.jasig.cas.authentication.InvalidLoginTimeException;
 import org.jasig.cas.web.flow.AuthenticationExceptionHandler;
 
+import org.jasig.cas.web.support.WebUtils;
 import org.springframework.binding.message.MessageContext;
 import org.springframework.webflow.execution.Event;
 import org.springframework.webflow.execution.RequestContext;
@@ -75,17 +76,14 @@ public class OpenScienceFrameworkAuthenticationExceptionHandler extends Authenti
 
     // Open Science Framework Exceptions
     static {
-        // Account Creation Exceptions
-        DEFAULT_ERROR_LIST.add(RegistrationFailureUserAlreadyExistsException.class);
-        DEFAULT_ERROR_LIST.add(RegistrationSuccessConfirmationRequiredException.class);
 
         // Login Exceptions
         DEFAULT_ERROR_LIST.add(AccountDisabledException.class);
         DEFAULT_ERROR_LIST.add(AccountNotFoundException.class);
+        DEFAULT_ERROR_LIST.add(AccountNotVerifiedException.class);
         DEFAULT_ERROR_LIST.add(FailedLoginException.class);
+        DEFAULT_ERROR_LIST.add(InvalidVerificationKeyException.class);
         DEFAULT_ERROR_LIST.add(ShouldNotHappenException.class);
-        DEFAULT_ERROR_LIST.add(UserNotConfirmedException.class);
-        DEFAULT_ERROR_LIST.add(UserNotClaimedException.class);
 
         // Remote Login Exceptions
         DEFAULT_ERROR_LIST.add(RemoteUserFailedLoginException.class);
@@ -123,22 +121,24 @@ public class OpenScienceFrameworkAuthenticationExceptionHandler extends Authenti
      * The authentication exception handler event.
      * Record the exception and put it in `jsonLoginContext` in flow scope.
      *
-     * @param context the request context
+     * @param requestContext the request context
      * @param e the authentication exception
      * @param messageContext the message context
      * @return an Event with the name of the exception
      */
-    public Event preHandle(final RequestContext context, final AuthenticationException e, final MessageContext messageContext) {
+    public Event preHandle(
+            final RequestContext requestContext,
+            final AuthenticationException e,
+            final MessageContext messageContext
+    ) {
         final String handleErrorName = super.handle(e, messageContext);
-
-        final String loginContext = (String) context.getFlowScope().get("jsonLoginContext");
-        final OpenScienceFrameworkLoginHandler.OpenScienceFrameworkLoginContext osfLoginContext
-                = OpenScienceFrameworkLoginHandler.OpenScienceFrameworkLoginContext.fromJson(loginContext);
-        if (osfLoginContext != null) {
-            osfLoginContext.setHandleErrorName(handleErrorName);
-            context.getFlowScope().put("jsonLoginContext", osfLoginContext.toJson());
+        final LoginManager loginMangerContext
+                = AbstractFlowUtils.getLoginManagerFromRequestContext(requestContext);
+        if (loginMangerContext != null) {
+            loginMangerContext.setHandleErrorName(handleErrorName);
+            loginMangerContext.setUsername(((OpenScienceFrameworkCredential) WebUtils.getCredential(requestContext)).getUsername());
+            AbstractFlowUtils.putLoginManagerToRequestContext(requestContext, loginMangerContext);
         }
-
         return new Event(this, handleErrorName);
     }
 }
