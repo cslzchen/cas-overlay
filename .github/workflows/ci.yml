@@ -1,0 +1,39 @@
+name: osf-cas CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-16.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK 1.8
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+      - name: Cache Maven packages
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+      - name: before install
+        run: |
+          mvn -v
+          apt-get uninstall maven
+          apt-get purge maven maven2 maven3
+          add-apt-repository ppa:andrei-pozolotin/maven2
+          apt-get update
+          apt-get install maven2
+          rm ~/.m2/settings.xml
+          cp -R $JAVA_HOME ~/.jdk
+          export JAVA_HOME=~/.jdk
+          curl -L --cookie 'oraclelicense=accept-securebackup-cookie;' http://download.oracle.com/otn-pub/java/jce/8/jce_policy-8.zip -o /tmp/policy.zip
+          unzip -j -o /tmp/policy.zip *.jar -d $JAVA_HOME/jre/lib/security
+          rm /tmp/policy.zip
+      - name: maven install
+        run: |
+          mvn install -P nocheck
+      - name: maven test
+        run: |
+          mvn test -P !nocheck
